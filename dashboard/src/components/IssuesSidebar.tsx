@@ -52,8 +52,8 @@ export function IssuesSidebar({
     <div className={`fixed inset-y-0 right-0 w-80 md:w-96 bg-slate-900 border-l border-white/10 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'} flex flex-col`}>
       <header className="p-4 border-b border-white/10 flex items-center justify-between bg-black/20">
         <div className="flex items-center gap-2 text-indigo-400">
-           <MessageSquare className="w-5 h-5" />
-           <h2 className="font-bold text-white text-sm uppercase tracking-wider">Repository Issues</h2>
+           <Terminal className="w-5 h-5" />
+           <h2 className="font-bold text-white text-sm uppercase tracking-wider">Workspace Logs</h2>
         </div>
         <div className="flex items-center gap-1">
            <button onClick={fetchIssues} className="p-1.5 hover:bg-white/10 rounded-full transition text-slate-400 hover:text-white">
