@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
-import { Send, Bot, User, ListChecks, Check, GitCommit, X, FileCode2, Ban, Trash2, PlusCircle, ExternalLink, MessageSquare, Terminal } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Send, Bot, User, ListChecks, Check, GitCommit, X, FileCode2, Ban, Trash2, PlusCircle, ExternalLink, MessageSquare, Terminal, Paperclip, Sparkles, Image as ImageIcon } from "lucide-react";
 import { LearnData } from "./LearnSidebar";
 
 type MessageNode = {
@@ -42,6 +42,7 @@ export function ChatClient({
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
      const saved = localStorage.getItem(STORAGE_KEY);
@@ -101,6 +102,19 @@ export function ChatClient({
      localStorage.removeItem(STORAGE_KEY);
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+       setMessages([...messages, { role: "assistant", content: `📁 **FILE UPLOADED**: \`${file.name}\`\n\nSystem analyzing contents for contextual integration...` }]);
+       onDeductTokensAction(5);
+    }
+  };
+
+  const handlePersonalIntelligence = () => {
+     setMessages([...messages, { role: "assistant", content: `🔮 **PERSONAL INTELLIGENCE IMPORTED**\n\nSyncing knowledge from other active agent personas into this workspace...` }]);
+     onDeductTokensAction(10);
+  };
+
   const executeFakeCommit = () => {
      if (isLocked) return;
      setMessages([...messages, { role: "assistant", content: "⚡ **COMMIT SUCCESSFUL**\n\nThe mock code has been dynamically committed and pushed to the repository securely.\n\n*(This was a local test because the actual OpenAI API was not triggered - you saved $0.05!)*"}]);
@@ -141,7 +155,7 @@ export function ChatClient({
           </div>
        </div>
 
-       <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
+       <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 scrollbar-thin scrollbar-thumb-indigo-500/20">
          {messages.map((m, idx) => (
             <div key={idx} className={`flex gap-4 ${m.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 overflow-hidden ${m.role === "assistant" ? "bg-indigo-500/20 text-indigo-400" : "bg-white/10 text-white border border-white/20"}`}>
@@ -226,17 +240,48 @@ export function ChatClient({
              </div>
           )}
           
-          <form className="max-w-4xl mx-auto w-full relative flex items-center" onSubmit={sendMessage}>
-             <input 
-               value={input}
-               onChange={(e) => setInput(e.target.value)}
-               placeholder={isLocked ? "Daily Quota Exceeded. Please upgrade your plan." : (selectedFile ? `Ask the Agent to edit ${selectedFile.split('/').pop()}...` : "Select a file or type a command...")}
-               disabled={loading || isLocked}
-               className={`w-full bg-black/40 border border-white/10 rounded-2xl py-4 pl-6 pr-24 text-white placeholder-slate-500 focus:outline-none ${isLocked ? "opacity-50 cursor-not-allowed border-red-500/50" : "focus:ring-2 focus:ring-indigo-500/50"}`}
-             />
-             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                <button type="submit" disabled={!input.trim() || loading || isLocked} className={`p-2.5 rounded-xl transition shadow-lg flex items-center justify-center ${isLocked ? "bg-red-500/20 text-red-400" : "bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:hover:bg-indigo-600 text-white"}`}>
-                   {isLocked ? <Ban className="w-5 h-5" /> : <Send className="w-5 h-5" />}
+          <form className="max-w-4xl mx-auto w-full relative flex flex-col" onSubmit={sendMessage}>
+             <div className="relative flex items-center">
+                <input 
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder={isLocked ? "Daily Quota Exceeded. Please upgrade your plan." : (selectedFile ? `Ask the Agent to edit ${selectedFile.split('/').pop()}...` : "Select a file or type a command...")}
+                  disabled={loading || isLocked}
+                  className={`w-full bg-black/40 border border-white/10 rounded-2xl py-4 pl-14 pr-24 text-white placeholder-slate-500 focus:outline-none ${isLocked ? "opacity-50 cursor-not-allowed border-red-500/50" : "focus:ring-2 focus:ring-indigo-500/50"}`}
+                />
+                <button 
+                  type="button" 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="absolute left-4 p-2 text-slate-500 hover:text-indigo-400 transition"
+                  title="Upload Documentation"
+                >
+                   <Paperclip className="w-5 h-5" />
+                </button>
+                <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} />
+                
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                   <button 
+                     type="button" 
+                     onClick={handlePersonalIntelligence}
+                     className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-indigo-400 transition"
+                     title="Import Personal Intelligence"
+                   >
+                      <Sparkles className="w-5 h-5" />
+                   </button>
+                   <button type="submit" disabled={!input.trim() || loading || isLocked} className={`p-2.5 rounded-xl transition shadow-lg flex items-center justify-center ${isLocked ? "bg-red-500/20 text-red-400" : "bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:hover:bg-indigo-600 text-white"}`}>
+                      {isLocked ? <Ban className="w-5 h-5" /> : <Send className="w-5 h-5" />}
+                   </button>
+                </div>
+             </div>
+             
+             {/* Dynamic Utility Strip */}
+             <div className="flex gap-4 px-2 pt-2">
+                <button 
+                  type="button" 
+                  onClick={() => setInput("")} 
+                  className="text-[10px] font-bold text-slate-600 hover:text-white uppercase tracking-widest flex items-center gap-1.5 transition"
+                >
+                   <X className="w-3.5 h-3.5" /> Clear Message
                 </button>
              </div>
           </form>
