@@ -102,7 +102,7 @@ export function RepoWorkspace({
         </div>
         
         {/* Mock API Quota Block with Update Action */}
-        <div className="p-4 border-t border-white/10 bg-black/20 m-2 rounded-xl border border-white/10 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]">
+        <div className="p-4 border-t border-white/10 bg-black/20 m-2 rounded-xl shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]">
            <div className="flex justify-between items-center mb-2 px-1">
               <span className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1.5"><Zap className="w-3 h-3 text-indigo-400"/> API Quota</span>
               <span className={`text-xs font-bold ${tokensUsed >= MAX_TOKENS ? "text-red-400" : "text-slate-300"}`}>{tokensUsed} / {MAX_TOKENS}</span>

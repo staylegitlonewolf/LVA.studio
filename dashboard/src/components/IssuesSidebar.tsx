@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Octokit } from "@octokit/rest";
-import { X, MessageSquare, AlertCircle, ExternalLink, RefreshCw } from "lucide-react";
+import { X, MessageSquare, AlertCircle, ExternalLink, RefreshCw, Terminal } from "lucide-react";
 
 export function IssuesSidebar({ 
   isOpen, 
