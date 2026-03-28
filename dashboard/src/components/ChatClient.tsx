@@ -211,15 +211,15 @@ export function ChatClient({
                       Clear <X className="w-2.5 h-2.5" />
                    </button>
                 </div>
-                <div className="p-4 bg-black/40 border border-indigo-500/30 rounded-xl relative overflow-hidden group">
-                   <div className="absolute inset-0 bg-linear-to-r from-indigo-500/0 via-indigo-500/5 to-purple-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="p-4 bg-black/60 border border-indigo-500/40 rounded-2xl relative overflow-hidden group shadow-[0_0_30px_rgba(99,102,241,0.15)] ring-1 ring-white/5">
+                   <div className="absolute inset-0 bg-linear-to-r from-indigo-500/0 via-indigo-500/10 to-purple-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                    <div className="flex items-center gap-4 relative z-10">
-                      <div className="w-10 h-10 bg-indigo-500/20 rounded-lg flex items-center justify-center ring-1 ring-indigo-500/30">
-                         <FileCode2 className="w-6 h-6 text-indigo-400" />
+                      <div className="w-12 h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center ring-1 ring-indigo-500/40 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+                         <FileCode2 className="w-7 h-7 text-indigo-400" />
                       </div>
                       <div className="flex-1 min-w-0">
-                         <h4 className="text-white font-bold text-sm truncate uppercase tracking-tight">{selectedFile.split('/').pop()}</h4>
-                         <p className="text-[10px] text-slate-500 font-mono truncate">{selectedFile}</p>
+                         <h4 className="text-white font-black text-sm truncate uppercase tracking-tight group-hover:text-indigo-300 transition-colors">{selectedFile.split('/').pop()}</h4>
+                         <p className="text-[10px] text-slate-500 font-mono truncate opacity-60 group-hover:opacity-100 transition-opacity">{selectedFile}</p>
                       </div>
                    </div>
                 </div>
