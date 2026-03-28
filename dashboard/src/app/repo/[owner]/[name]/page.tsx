@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Octokit } from "@octokit/rest";
-import { ChatClient } from "@/components/ChatClient";
+import { RepoWorkspace } from "@/components/RepoWorkspace";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -44,25 +44,12 @@ export default async function RepoPage({ params }: { params: Promise<{ owner: st
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
-         <div className="w-64 border-r border-white/10 bg-slate-900/50 overflow-y-auto p-4 hidden md:block shrink-0">
-           <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Repository Files</h2>
-           {treeData.length === 0 ? <p className="text-sm text-slate-600">Failed to load or empty repo.</p> : (
-             <ul className="space-y-1">
-               {treeData.slice(0, 50).map((file, i) => (
-                 <li key={i} className="text-sm text-slate-400 truncate opacity-80 hover:opacity-100 cursor-default" title={file.path}>{file.path}</li>
-               ))}
-               {treeData.length > 50 && <li className="text-xs text-indigo-400 italic mt-2">...and {treeData.length - 50} more files</li>}
-             </ul>
-           )}
-         </div>
-
-         <div className="flex-1 flex flex-col bg-slate-950/50 relative">
-            {repoData && owner && name ? (
-               <ChatClient owner={owner} repo={name} defaultBranch={repoData.default_branch || "main"} />
-            ) : <div className="p-8">Repo not found or permission denied.</div>}
-         </div>
-      </div>
+      <RepoWorkspace 
+         owner={owner} 
+         repo={name} 
+         defaultBranch={repoData?.default_branch || "main"} 
+         treeData={treeData} 
+      />
     </div>
   );
 }
