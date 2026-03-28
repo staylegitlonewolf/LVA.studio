@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { Send, Bot, User, ListChecks, Check, GitCommit, X, FileCode2, Ban, Trash2, PlusCircle, ExternalLink, MessageSquare, Terminal, Paperclip, Sparkles, Image as ImageIcon } from "lucide-react";
+import { Send, Bot, User, ListChecks, Check, GitCommit, X, FileCode2, Ban, Trash2, PlusCircle, ExternalLink, MessageSquare, Terminal, Paperclip, Sparkles, Image as ImageIcon, Database } from "lucide-react";
 import { LearnData } from "./LearnSidebar";
+import { ImportContextModal } from "./ImportContextModal";
 
 type MessageNode = {
   role: string;
@@ -38,10 +39,15 @@ export function ChatClient({
   onOpenIssuesAction: () => void;
 }) {
   const STORAGE_KEY = `agent_chat_${owner}_${repo}`;
+  const MEMORY_KEY = `agent_memory_${owner}_${repo}`;
+  
   const [messages, setMessages] = useState<MessageNode[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
+  const [isMemoryModalOpen, setIsMemoryModalOpen] = useState(false);
+  const [globalMemory, setGlobalMemory] = useState("");
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -53,8 +59,12 @@ export function ChatClient({
      } else {
         setMessages([{ role: "assistant", content: `Agent Neo Matrix Mode activated for ${repo} 🕶️✨\n\nWhat would you like to update and change today?` }]);
      }
+     
+     const savedMemory = localStorage.getItem(MEMORY_KEY);
+     if (savedMemory) setGlobalMemory(savedMemory);
+     
      setHasLoaded(true);
-  }, [STORAGE_KEY, repo]);
+  }, [STORAGE_KEY, MEMORY_KEY, repo]);
 
   useEffect(() => {
      if (hasLoaded) {
@@ -72,8 +82,13 @@ export function ChatClient({
     if (selectedFile) {
        finalInput = `[Target File: ${selectedFile}]\n${input}`;
     }
+    
+    // Inject global memory context
+    if (globalMemory) {
+       finalInput = `[IMPORTED MEMORY: ${globalMemory.slice(0, 500)}...]\n${finalInput}`;
+    }
 
-    const newMsgs = [...messages, { role: "user", content: finalInput }];
+    const newMsgs = [...messages, { role: "user", content: input }]; // show original input to user
     setMessages(newMsgs);
     setInput("");
     setLoading(true);
@@ -110,9 +125,12 @@ export function ChatClient({
     }
   };
 
-  const handlePersonalIntelligence = () => {
-     setMessages([...messages, { role: "assistant", content: `🔮 **PERSONAL INTELLIGENCE IMPORTED**\n\nSyncing knowledge from other active agent personas into this workspace...` }]);
+  const handleImportMemory = (memory: string) => {
+     setGlobalMemory(memory);
+     localStorage.setItem(MEMORY_KEY, memory);
+     setMessages([...messages, { role: "assistant", content: `🔮 **UNIVERSAL MEMORY SYNCED**\n\nThe Matrix has been updated with external intelligence summaries and chat archives (Length: ${memory.length} Chars).` }]);
      onDeductTokensAction(10);
+     setIsMemoryModalOpen(false);
   };
 
   const executeFakeCommit = () => {
@@ -150,12 +168,20 @@ export function ChatClient({
                 <MessageSquare className="w-3.5 h-3.5" /> Workspace Logs
              </button>
           </div>
-          <div className={`text-[10px] font-bold uppercase tracking-widest ${isLocked ? 'text-red-500 animate-pulse' : 'text-slate-600'}`}>
-             {isLocked ? "System Locked" : "Neo Sync: Online"}
+          <div className="flex items-center gap-4">
+             {globalMemory && (
+                <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full animate-pulse shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                   <Database className="w-3 h-3 text-emerald-400" />
+                   <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest leading-none">Context Sync Active</span>
+                </div>
+             )}
+             <div className={`text-[10px] font-bold uppercase tracking-widest ${isLocked ? 'text-red-500 animate-pulse' : 'text-slate-600'}`}>
+                {isLocked ? "System Locked" : "Neo Sync: Online"}
+             </div>
           </div>
        </div>
 
-       <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 scrollbar-thin scrollbar-thumb-indigo-500/20">
+       <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 custom-scroller">
          {messages.map((m, idx) => (
             <div key={idx} className={`flex gap-4 ${m.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 overflow-hidden ${m.role === "assistant" ? "bg-indigo-500/20 text-indigo-400" : "bg-white/10 text-white border border-white/20"}`}>
@@ -262,9 +288,9 @@ export function ChatClient({
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
                    <button 
                      type="button" 
-                     onClick={handlePersonalIntelligence}
+                     onClick={() => setIsMemoryModalOpen(true)}
                      className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-indigo-400 transition"
-                     title="Import Personal Intelligence"
+                     title="Sync Intelligence Memory"
                    >
                       <Sparkles className="w-5 h-5" />
                    </button>
@@ -286,6 +312,12 @@ export function ChatClient({
              </div>
           </form>
        </div>
+
+       <ImportContextModal 
+          isOpen={isMemoryModalOpen} 
+          onCloseAction={() => setIsMemoryModalOpen(false)}
+          onImportMemoryAction={handleImportMemory}
+       />
     </div>
   );
 }
