@@ -15,11 +15,11 @@ export type LearnData = {
 
 export function LearnSidebar({ 
   isOpen, 
-  onClose, 
+  onCloseAction, 
   data 
 }: { 
   isOpen: boolean; 
-  onClose: () => void; 
+  onCloseAction: () => void; 
   data: LearnData | null 
 }) {
   if (!isOpen) return null;
@@ -40,7 +40,7 @@ export function LearnSidebar({
            <BookOpen className="w-5 h-5 text-indigo-400" />
            <h2 className="font-bold text-white text-sm uppercase tracking-wider">LEARN.md <span className="text-slate-500 text-xs ml-1">{data?.version || "v1.0"}</span></h2>
         </div>
-        <button onClick={onClose} className="p-1 hover:bg-white/10 rounded-full transition text-slate-400 hover:text-white">
+        <button onClick={onCloseAction} className="p-1 hover:bg-white/10 rounded-full transition text-slate-400 hover:text-white">
           <X className="w-5 h-5" />
         </button>
       </header>

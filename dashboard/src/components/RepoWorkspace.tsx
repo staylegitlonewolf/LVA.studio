@@ -51,7 +51,7 @@ export function RepoWorkspace({
   return (
     <div className="flex flex-1 overflow-hidden relative">
       {/* Interactive Sidebar */}
-      <div className="w-64 border-r border-white/10 bg-slate-900/50 flex flex-col hidden md:flex shrink-0">
+      <div className="w-64 border-r border-white/10 bg-slate-900/50 hidden md:flex flex-col shrink-0">
         <div className="flex-1 overflow-y-auto p-4">
            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center justify-between">
               Repository Files
@@ -79,7 +79,7 @@ export function RepoWorkspace({
         </div>
         
         {/* Mock API Quota Block */}
-        <div className="p-4 border-t border-white/10 bg-black/20 m-2 rounded-xl border border-white/10 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]">
+        <div className="p-4 border-t border-white/10 bg-black/20 m-2 rounded-xl shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]">
            <div className="flex justify-between items-center mb-2 px-1">
               <span className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1.5"><Zap className="w-3 h-3 text-indigo-400"/> API Quota</span>
               <span className={`text-xs font-bold ${tokensUsed >= MAX_TOKENS ? "text-red-400" : "text-slate-300"}`}>{tokensUsed} / {MAX_TOKENS}</span>
@@ -102,12 +102,12 @@ export function RepoWorkspace({
                repo={repo} 
                defaultBranch={defaultBranch} 
                selectedFile={selectedFile} 
-               onClearFile={() => setSelectedFile(null)}
+               onClearFileAction={() => setSelectedFile(null)}
                userImage={userImage}
                tokensUsed={tokensUsed}
                maxTokens={MAX_TOKENS}
-               onDeductTokens={deductTokens}
-               onOpenLearn={handleOpenLearn}
+               onDeductTokensAction={deductTokens}
+               onOpenLearnAction={handleOpenLearn}
             />
          ) : <div className="p-8 text-slate-400 flex flex-col items-center justify-center h-full">
             <Zap className="w-12 h-12 text-indigo-500 animate-pulse mb-4 opacity-20" />
@@ -118,7 +118,7 @@ export function RepoWorkspace({
       {/* Right Learn Sidebar */}
       <LearnSidebar 
          isOpen={isLearnOpen} 
-         onClose={() => setIsLearnOpen(false)} 
+         onCloseAction={() => setIsLearnOpen(false)} 
          data={learnData}
       />
     </div>

@@ -17,23 +17,23 @@ export function ChatClient({
   repo, 
   defaultBranch, 
   selectedFile, 
-  onClearFile, 
+  onClearFileAction, 
   userImage, 
   tokensUsed, 
   maxTokens, 
-  onDeductTokens,
-  onOpenLearn
+  onDeductTokensAction,
+  onOpenLearnAction
 }: { 
   owner: string; 
   repo: string; 
   defaultBranch: string; 
   selectedFile: string | null; 
-  onClearFile: () => void; 
+  onClearFileAction: () => void; 
   userImage: string | null; 
   tokensUsed: number; 
   maxTokens: number; 
-  onDeductTokens: (n: number) => void; 
-  onOpenLearn: (data: LearnData) => void;
+  onDeductTokensAction: (n: number) => void; 
+  onOpenLearnAction: (data: LearnData) => void;
 }) {
   const STORAGE_KEY = `agent_chat_${owner}_${repo}`;
   const [messages, setMessages] = useState<MessageNode[]>([]);
@@ -84,7 +84,7 @@ export function ChatClient({
 
       const data = await resp.json();
       setMessages([...newMsgs, { role: "assistant", content: data.reply || "I was unable to generate a response.", plan: data.plan }]);
-      onDeductTokens(15);
+      onDeductTokensAction(15);
     } catch (err: any) {
        console.error("Agent API Error:", err);
        setMessages([...newMsgs, { role: "assistant", content: "Error connecting to Agent API. " + (err.message || "") }]);
@@ -102,7 +102,7 @@ export function ChatClient({
   const executeFakeCommit = () => {
      if (isLocked) return;
      setMessages([...messages, { role: "assistant", content: "⚡ **COMMIT SUCCESSFUL**\n\nThe mock code has been dynamically committed and pushed to the repository securely.\n\n*(This was a local test because the actual OpenAI API was not triggered - you saved $0.05!)*"}]);
-     onDeductTokens(45);
+     onDeductTokensAction(45);
   };
 
   const handleAddToDo = (msgContent: string) => {
@@ -112,13 +112,13 @@ export function ChatClient({
         target: selectedFile || "General Task",
         purpose: "Implement advanced interface changes and logic for the current session.",
         action: "Automated analysis of the selected context and generation of an action plan.",
-        problems: "Potential race conditions or state synchronization delays in high-latency environments.",
-        plan: "Deploy a reactive state manager to handle sidebar transitions smoothly.",
-        fix: "Injected a new React Context Provider to unify the Sidebar and Workspace states.",
-        warnings: "Avoid direct DOM manipulation; always use the React state hooks provided.",
-        neoMessage: "NEO: You are pushing the boundaries of the Matrix. Proceed with caution."
+        problems: "Detected a request that requires advanced backend integration or custom infrastructure updates.",
+        plan: "Log the request into the central Project Management board for manual developer review.",
+        fix: "Injected a tracking tag into the repository history to flag this task for the next CI/CD cycle.",
+        warnings: "Do not attempt to bypass backend security layers without direct authorization.",
+        neoMessage: "This is a message from the dev himself: You are trying to do something which requires contacting your dev to do backend work. For now you can ADD-TO-DO in Client Request: https://github.com/users/staylegitlonewolf/projects/5"
      };
-     onOpenLearn(mockLearn);
+     onOpenLearnAction(mockLearn);
   };
 
   if (!hasLoaded) return null;
@@ -206,7 +206,7 @@ export function ChatClient({
                 <div className="flex items-center gap-2 bg-linear-to-r from-indigo-600 to-purple-600 border border-white/20 text-white px-3 py-1 rounded-lg text-xs font-bold shadow-lg shadow-indigo-500/20">
                    <FileCode2 className="w-3 h-3" />
                    {selectedFile}
-                   <button onClick={onClearFile} className="hover:text-white transition-colors ml-1 focus:outline-none bg-black/20 rounded-full p-0.5"><X className="w-2.5 h-2.5" /></button>
+                   <button onClick={onClearFileAction} className="hover:text-white transition-colors ml-1 focus:outline-none bg-black/20 rounded-full p-0.5"><X className="w-2.5 h-2.5" /></button>
                 </div>
              </div>
           )}

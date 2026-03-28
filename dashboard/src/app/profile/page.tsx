@@ -88,7 +88,7 @@ export default function ProfilePage() {
             <section className="p-6 rounded-2xl bg-white/5 border border-white/10 space-y-6">
                <div className="flex items-center gap-3 mb-2">
                   <Key className="w-5 h-5 text-indigo-400" />
-                  <h3 className="font-bold text-lg text-white text-transparent bg-clip-text bg-linear-to-r from-white to-slate-400">Personal API Integrations</h3>
+                  <h3 className="font-bold text-lg text-white">Personal API Integrations</h3>
                </div>
                <p className="text-sm text-slate-400 mb-6 italic opacity-80">Provide your own model keys here to use custom AI configurations. Keys are stored locally in your browser.</p>
                
@@ -134,7 +134,7 @@ export default function ProfilePage() {
             </section>
 
             {/* Collaborators Section */}
-            <section className="p-6 rounded-2xl bg-white/5 border border-white/10 space-y-6 border-indigo-500/20">
+            <section className="p-6 rounded-2xl bg-white/5 border border-indigo-500/20 space-y-6">
                <div className="flex items-center gap-3 mb-2">
                   <Users className="w-5 h-5 text-indigo-400" />
                   <h3 className="font-bold text-lg text-white">Team Management</h3>
