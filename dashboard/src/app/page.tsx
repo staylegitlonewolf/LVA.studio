@@ -91,6 +91,7 @@ export default function Home() {
                 <div>
                   <label className="text-xs text-[var(--color-muted)] uppercase tracking-[0.2em]">Email</label>
                   <input
+                    autoComplete="email"
                     placeholder="member@lvastudio.com"
                     className="mt-2 w-full rounded-2xl bg-black/40 border border-white/10 px-4 py-3 text-sm outline-hidden focus:border-[var(--color-accent)]"
                   />
@@ -99,6 +100,7 @@ export default function Home() {
                   <label className="text-xs text-[var(--color-muted)] uppercase tracking-[0.2em]">Password</label>
                   <input
                     type="password"
+                    autoComplete="current-password"
                     placeholder="••••••••"
                     className="mt-2 w-full rounded-2xl bg-black/40 border border-white/10 px-4 py-3 text-sm outline-hidden focus:border-[var(--color-accent)]"
                   />
@@ -106,6 +108,7 @@ export default function Home() {
                 <div>
                   <label className="text-xs text-[var(--color-muted)] uppercase tracking-[0.2em]">2-Step Code</label>
                   <input
+                    autoComplete="one-time-code"
                     placeholder="123 456"
                     className="mt-2 w-full rounded-2xl bg-black/40 border border-white/10 px-4 py-3 text-sm outline-hidden focus:border-[var(--color-accent)]"
                   />
