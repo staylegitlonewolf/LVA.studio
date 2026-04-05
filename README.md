@@ -5,6 +5,68 @@ The focus is a **local-first web app** with a polished owner/member workspace
 and an **agent-powered canvas/editor experience**. Backend auth and automations
 will come later.
 
+## Product Direction (BETA)
+
+**Public homepage**
+
+This is your **For Dev / Non-Tech** marketing surface.
+Its job is to:
+
+- explain what LVA.Studio is
+- speak to both audiences
+- get people into the software
+
+**Product app**
+
+This is the **inside experience** after they enter.
+Its job is to:
+
+- let users create projects
+- use agents
+- work in the canvas/editor
+- manage their portal workflow
+
+**So are we already doing this?**
+
+**Yes, conceptually.**
+You already have the split forming:
+
+- **Homepage** = public-facing entry
+- **Projects / Workspace / Owner** = actual software experience
+
+**What changed**
+
+**Old prototype**
+
+- GitHub-centered
+- agent/control-center feel
+- more dev/tooling oriented
+
+**New BETA**
+
+- broader SaaS portal
+- for dev **and** non-tech users
+- projects first
+- workspace first
+- agents embedded into the workflow
+
+**Best way to describe it**
+
+Yes — this is the new BETA product direction.
+
+The “For Dev / Non-Tech” homepage is still the public-facing marketing/entry page.
+
+What’s new is the product experience after entry:
+
+- Projects Home
+- Workspace
+- Owner Dashboard
+- agent-powered canvas/editor flow
+
+So the homepage sells the vision, and the app is where users actually work.
+
+That means we are not replacing the public homepage concept — we’re separating the public homepage from the real software UI.
+
 ## What this BETA can do (right now)
 
 - Present a real SaaS-style portal entry (mock login/signup + role preview)
