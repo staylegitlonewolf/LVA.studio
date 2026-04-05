@@ -47,6 +47,13 @@ export default function ProjectsClient() {
     label: recentProjects[0].name,
     source: "Project",
   });
+  const workspaceLabel = continueEditing.label;
+  const workspaceSource = continueEditing.source;
+  const workspaceCta = workspaceSource === "Template" ? "Generate Starter Project" : "Open Canvas";
+  const workspaceHref = `/workspace?${new URLSearchParams({
+    project: workspaceLabel,
+    source: workspaceSource,
+  }).toString()}`;
 
   return (
     <main className="bg-atmosphere min-h-screen">
@@ -167,14 +174,16 @@ export default function ProjectsClient() {
               <span className="badge px-3 py-1 text-xs">{continueEditing.source}</span>
             </div>
             <p className="text-sm text-[var(--color-muted)]">
-              Last opened 2 hours ago. 12 nodes connected.
+              {continueEditing.source === "Template"
+                ? "Starter blueprint ready. Generate the first draft in the workspace."
+                : "Last opened 2 hours ago. 12 nodes connected."}
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
-                href={`/workspace?role=${role}`}
+                href={`${workspaceHref}&role=${role}`}
                 className="btn-secondary"
               >
-                Open Canvas <ArrowRight className="h-4 w-4" />
+                {workspaceCta} <ArrowRight className="h-4 w-4" />
               </Link>
               {isOwner ? (
                 <Link

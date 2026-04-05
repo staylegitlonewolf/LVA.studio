@@ -43,6 +43,9 @@ export default function WorkspacePage() {
   const [agentInput, setAgentInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [lastAction, setLastAction] = useState("Ready");
+  const [workspaceLabel, setWorkspaceLabel] = useState(projects[0].name);
+  const [workspaceSource, setWorkspaceSource] = useState("Project");
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const activeProject = useMemo(
     () => projects.find((project) => project.id === activeProjectId) ?? projects[0],
@@ -50,10 +53,41 @@ export default function WorkspacePage() {
   );
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const project = params.get("project");
+    const source = params.get("source");
+    if (project) {
+      const matching = projects.find((item) => item.name === project);
+      if (matching) {
+        setActiveProjectId(matching.id);
+      }
+      setWorkspaceLabel(project);
+      if (source) {
+        setWorkspaceSource(source);
+      }
+      if (source === "Template") {
+        triggerGeneration(`Generate ${project}`);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     setIsTyping(true);
     const timeout = setTimeout(() => setIsTyping(false), 1600);
     return () => clearTimeout(timeout);
   }, [activeProjectId]);
+
+  const triggerGeneration = (prompt: string) => {
+    setAgentInput(prompt);
+    setLastAction("Generating");
+    setIsGenerating(true);
+    setIsTyping(true);
+    setTimeout(() => {
+      setIsTyping(false);
+      setLastAction("Queued");
+      setIsGenerating(false);
+    }, 1600);
+  };
 
   const handlePrompt = (prompt: string) => {
     setAgentInput(prompt);
@@ -147,9 +181,9 @@ export default function WorkspacePage() {
             <div className="surface-panel p-4 flex flex-wrap items-center justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">Canvas</p>
-                <h2 className="text-xl font-semibold">{activeProject.name}</h2>
+                <h2 className="text-xl font-semibold">{workspaceLabel}</h2>
                 <p className="text-sm text-[var(--color-muted)]">
-                  {activeProject.status} · Updated {activeProject.updated}
+                  {workspaceSource} · {activeProject.status} · Updated {activeProject.updated}
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]">
@@ -196,13 +230,18 @@ export default function WorkspacePage() {
                     Create a project, drag components onto the canvas, and connect workflows. Ask
                     Sciplex or Neo to generate your first sequence.
                   </p>
+                  {isGenerating ? (
+                    <div className="mt-4 inline-flex items-center gap-2 badge px-3 py-1 text-xs">
+                      Generating starter project...
+                    </div>
+                  ) : null}
                 </div>
                 <div className="flex flex-wrap gap-3 justify-center">
                   {quickActions.map((action) => (
                     <button
                       key={action}
                       className="btn-secondary"
-                      onClick={() => handlePrompt(action)}
+                      onClick={() => triggerGeneration(action)}
                     >
                       {action}
                     </button>
