@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { ArrowLeft, Github } from "lucide-react/icons";
+import { ArrowLeft, FolderGit } from "lucide-react";
+
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return [{ owner: "legacy", name: "repo" }];
+}
 
 export default function RepoPage({ params }: { params: { owner: string; name: string } }) {
   return (
@@ -7,7 +13,7 @@ export default function RepoPage({ params }: { params: { owner: string; name: st
       <div className="max-w-2xl mx-auto surface-card p-10 space-y-6">
         <div className="flex items-center gap-3">
           <div className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-            <Github className="h-6 w-6 text-[var(--color-accent)]" />
+            <FolderGit className="h-6 w-6 text-[var(--color-accent)]" />
           </div>
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">Legacy GitHub</p>

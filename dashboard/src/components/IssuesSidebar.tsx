@@ -16,19 +16,20 @@ export function IssuesSidebar({
   repo: string; 
 }) {
   const { data: session } = useSession();
+  const accessToken = (session as any)?.accessToken as string | undefined;
   const [issues, setIssues] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (isOpen && session?.accessToken) {
+    if (isOpen && accessToken) {
       fetchIssues();
     }
-  }, [isOpen, session]);
+  }, [isOpen, accessToken]);
 
   const fetchIssues = async () => {
-    if (!session?.accessToken) return;
+    if (!accessToken) return;
     setLoading(true);
-    const octokit = new Octokit({ auth: session.accessToken });
+    const octokit = new Octokit({ auth: accessToken });
     try {
       const resp = await octokit.rest.issues.listForRepo({
         owner,
