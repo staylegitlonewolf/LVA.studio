@@ -1,56 +1,37 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { Octokit } from "@octokit/rest";
-import { RepoWorkspace } from "@/components/RepoWorkspace";
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
-import { redirect } from "next/navigation";
+import { ArrowLeft, Github } from "lucide-react";
 
-export default async function RepoPage({ params }: { params: Promise<{ owner: string; repo: string }> | { owner: string; repo: string } }) {
-  // In Next.js 15, params is a promise
-  const resolvedParams = await Promise.resolve(params);
-  const owner = resolvedParams.owner || resolvedParams.owner;
-  const name = resolvedParams.repo || (resolvedParams as any).name;
-
-  const session = await getServerSession(authOptions);
-  
-  if (!session || !(session as any).accessToken) {
-    redirect("/");
-  }
-
-  const octokit = new Octokit({ auth: (session as any).accessToken });
-  let repoData = null;
-  let treeData: any[] = [];
-
-  try {
-     const res = await octokit.rest.repos.get({ owner, repo: name });
-     repoData = res.data;
-     
-     const branchRes = await octokit.rest.repos.getBranch({ owner, repo: name, branch: repoData.default_branch });
-     const treeRes = await octokit.rest.git.getTree({ owner, repo: name, tree_sha: branchRes.data.commit.sha, recursive: "1" });
-     treeData = treeRes.data.tree.filter((t: any) => t.type === "blob");
-  } catch(e) {
-     console.error("Error fetching repo or tree data server side:", e);
-  }
-
+export default function RepoPage({ params }: { params: { owner: string; name: string } }) {
   return (
-    <div className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-950">
-      <header className="p-4 border-b border-white/10 bg-white/5 flex items-center justify-between shrink-0 hover:bg-white/10 transition">
-        <div className="flex items-center gap-4">
-           <Link href="/" className="p-2 hover:bg-white/10 rounded-full transition text-slate-400 hover:text-white">
-              <ChevronLeft className="w-5 h-5" />
-           </Link>
-           <h1 className="font-semibold text-white text-lg">{owner} / <span className="text-indigo-400">{name}</span></h1>
+    <main className="min-h-screen bg-atmosphere px-6 py-16">
+      <div className="max-w-2xl mx-auto surface-card p-10 space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+            <Github className="h-6 w-6 text-[var(--color-accent)]" />
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">Legacy GitHub</p>
+            <h1 className="text-2xl font-semibold">
+              {params.owner}/{params.name}
+            </h1>
+          </div>
         </div>
-      </header>
-
-      <RepoWorkspace 
-         owner={owner} 
-         repo={name} 
-         defaultBranch={repoData?.default_branch || "main"} 
-         treeData={treeData} 
-         userImage={session.user?.image || null}
-      />
-    </div>
+        <p className="text-[var(--color-muted)]">
+          The GitHub agent workspace is paused in Beta while we focus on the LVA B2B portal. GitHub
+          workflows will return once the new auth and workspace foundation are locked.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <span className="badge px-3 py-1 text-xs">GitHub sync disabled</span>
+          <span className="badge-warm px-3 py-1 text-xs">Workspace shell only</span>
+        </div>
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-accent)]"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Portal
+        </Link>
+      </div>
+    </main>
   );
 }

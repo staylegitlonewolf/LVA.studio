@@ -1,21 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Sora, Newsreader } from "next/font/google";
 import "./globals.css";
-import { Providers } from "@/components/Providers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sora = Sora({
+  variable: "--font-sora",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "AI Control Center",
-  description: "Web Dashboard for the AI Coding Agent",
+  title: "LVA B2B Portal (Beta)",
+  description: "LVA Studio beta portal for owner and member workspaces.",
 };
 
 export default function RootLayout({
@@ -24,9 +23,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} dark`}>
-      <body className="min-h-screen bg-slate-950 text-slate-50 antialiased selection:bg-indigo-500/30">
-        <Providers>{children}</Providers>
+    <html lang="en" className={`${sora.variable} ${newsreader.variable}`}>
+      <body className="min-h-screen bg-[var(--color-ink)] text-[var(--color-text)] antialiased selection:bg-[var(--color-accent)]/30">
+        {children}
       </body>
     </html>
   );

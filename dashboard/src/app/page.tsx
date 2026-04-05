@@ -1,200 +1,371 @@
 "use client";
-import { useSession, signOut, signIn } from "next-auth/react";
-import { useState, useEffect } from "react";
-import { Octokit } from "@octokit/rest";
-import { CodeSquare, GitBranch, Settings, Eye, EyeOff, LayoutGrid, Key, ChevronRight, Lock, Zap } from "lucide-react";
-import Link from "next/link";
-import { ButtonLogin, ButtonLogout } from "@/components/AuthButtons";
+
+import { useState } from "react";
+import {
+  ArrowRight,
+  Bot,
+  CheckCircle2,
+  ChevronRight,
+  ClipboardList,
+  Cloud,
+  Crown,
+  FileStack,
+  Grid3x3,
+  LayoutGrid,
+  Lock,
+  PanelLeft,
+  PenTool,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  Wand2,
+} from "lucide-react";
+
+type RoleMode = "guest" | "owner" | "member";
+type AuthTab = "login" | "signup";
+
+const mockProjects = [
+  { name: "LVA Studio Portal", status: "In Build", tag: "Owner" },
+  { name: "Sciplex Client Hub", status: "Design Review", tag: "Client" },
+  { name: "Neo Workflow Kit", status: "Drafting", tag: "Internal" },
+  { name: "Beta Launch Plan", status: "Mapped", tag: "Ops" },
+];
+
+const agentQueue = [
+  { title: "Neo", role: "Strategy", task: "Define milestone map for Q2." },
+  { title: "Sciplex", role: "Ops", task: "Assemble portal onboarding flow." },
+  { title: "Atlas", role: "Design", task: "Generate canvas layout variants." },
+];
 
 export default function Home() {
-  const { data: session, status } = useSession();
-  const [repos, setRepos] = useState<any[]>([]);
-  const [hiddenRepos, setHiddenRepos] = useState<string[]>([]);
-  const [showManageRepos, setShowManageRepos] = useState(false);
-  const [accessCode, setAccessCode] = useState("");
-  const [loginLoading, setLoginLoading] = useState(false);
-  const [repoLoading, setRepoLoading] = useState(false);
-
-  useEffect(() => {
-    // Load hidden repos from storage
-    const saved = localStorage.getItem("agent_hidden_repos");
-    if (saved) setHiddenRepos(JSON.parse(saved));
-    
-    if (session?.accessToken) {
-       fetchRepos(session.accessToken);
-    }
-  }, [session]);
-
-  const fetchRepos = async (token: string) => {
-    setRepoLoading(true);
-    const octokit = new Octokit({ auth: token });
-    try {
-      const resp = await octokit.rest.repos.listForAuthenticatedUser({ sort: "updated", per_page: 50 });
-      setRepos(resp.data);
-    } catch (e) {
-      console.error("Failed to fetch Github repos", e);
-    } finally {
-      setRepoLoading(false);
-    }
-  };
-
-  const toggleHideRepo = (fullName: string) => {
-    const updated = hiddenRepos.includes(fullName) 
-      ? hiddenRepos.filter(r => r !== fullName) 
-      : [...hiddenRepos, fullName];
-    setHiddenRepos(updated);
-    localStorage.setItem("agent_hidden_repos", JSON.stringify(updated));
-  };
-
-  const handleAccessCodeLogin = async (e: React.FormEvent) => {
-     e.preventDefault();
-     if (!accessCode) return;
-     setLoginLoading(true);
-     const result = await signIn("access-code", {
-        code: accessCode,
-        redirect: false,
-     });
-     setLoginLoading(false);
-     if (result?.error) {
-        alert("Invalid access code or PAT. Please check your GitHub settings.");
-     }
-  };
-
-  const filteredRepos = repos.filter(r => !hiddenRepos.includes(r.full_name));
+  const [mode, setMode] = useState<RoleMode>("guest");
+  const [authTab, setAuthTab] = useState<AuthTab>("login");
 
   return (
-    <main className="flex flex-col min-h-screen relative overflow-hidden bg-slate-950">
-      <header className="p-6 flex items-center justify-between border-b border-white/10 bg-white/5 backdrop-blur-md relative z-20">
-        <div className="flex items-center gap-2">
-           <CodeSquare className="text-indigo-400 w-6 h-6"/>
-           <h1 className="text-xl font-bold tracking-tight text-white">AI Control Center</h1>
-        </div>
-        <div className="flex items-center gap-4">
-           {session && (
-              <button 
-                onClick={() => setShowManageRepos(!showManageRepos)}
-                className={`text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-full transition-all border ${showManageRepos ? 'bg-indigo-500 text-white border-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.4)]' : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10'}`}
-              >
-                 Repos
-              </button>
-           )}
-           {session?.user?.image && (
-              <Link href="/profile" className="hover:opacity-80 transition active:scale-95">
-                 <img src={session.user.image} className="w-8 h-8 rounded-full border border-indigo-500/50" alt="Avatar" />
-              </Link>
-           )}
-           {session ? <ButtonLogout /> : null}
-        </div>
-      </header>
-      
-      <div className="flex-1 w-full max-w-6xl mx-auto p-6 md:p-12 relative z-10">
-        {!session ? (
-           <div className="flex flex-col items-center justify-center pt-16 text-center">
-              <div className="w-24 h-24 bg-indigo-500/20 rounded-full flex items-center justify-center mb-6 ring-1 ring-indigo-500/50 shadow-[0_0_40px_rgba(99,102,241,0.2)]">
-                 <GitBranch className="w-12 h-12 text-indigo-400" />
-              </div>
-              <h2 className="text-4xl md:text-5xl font-extrabold tracking-tighter mb-4 text-white">
-                Professional OPS Hub.
-              </h2>
-              <p className="text-slate-400 max-w-lg mb-12 text-md">
-                Secure AI workspace management. Sign in with GitHub OAuth or use a personal access code for one-time sessions.
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-2xl">
-                 <div className="p-8 rounded-3xl bg-white/5 border border-white/10 flex flex-col items-center gap-4 group hover:bg-white/10 transition">
-                    <LayoutGrid className="w-10 h-10 text-indigo-400 group-hover:scale-110 transition" />
-                    <h3 className="font-bold text-lg text-white">Developer Login</h3>
-                    <p className="text-xs text-slate-500 mb-4">Standard OAuth 2.0 flow for full workspace permissions.</p>
-                    <ButtonLogin />
-                 </div>
-                 
-                 <div className="p-8 rounded-3xl bg-white/5 border border-white/10 flex flex-col items-center gap-4 group hover:bg-white/10 transition">
-                    <Lock className="w-10 h-10 text-purple-400 group-hover:scale-110 transition" />
-                    <h3 className="font-bold text-lg text-white">Access via Code</h3>
-                    <p className="text-xs text-slate-500 mb-4">Use a Personal Access Token (classic) for client access.</p>
-                    <form onSubmit={handleAccessCodeLogin} className="w-full flex flex-col gap-2">
-                       <input 
-                         type="password" 
-                         value={accessCode}
-                         onChange={(e) => setAccessCode(e.target.value)}
-                         placeholder="Paste GHP Token or Proxy Code..." 
-                         className="bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs text-white outline-none focus:ring-1 focus:ring-purple-500/50"
-                       />
-                       <button type="submit" disabled={loginLoading} className="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 rounded-xl text-xs transition uppercase tracking-widest">
-                          {loginLoading ? "Verifying..." : "Sign In with Code"}
-                       </button>
-                    </form>
-                 </div>
-              </div>
-           </div>
-        ) : (
-           <div>
-              <div className="mb-8 p-8 rounded-3xl bg-linear-to-br from-indigo-500/10 to-purple-500/10 border border-white/10 backdrop-blur-md">
-                <div className="flex flex-col md:flex-row md:items-center gap-6">
-                   {session.user?.image && <img src={session.user.image} className="w-20 h-20 rounded-full border-2 border-indigo-500/50 shadow-lg shadow-indigo-500/20" alt="Avatar" />}
-                   <div className="flex-1">
-                      <h2 className="text-3xl font-extrabold text-white mb-1">Welcome back, {session.user?.name || session.user?.email || "Agent"}</h2>
-                      <p className="text-slate-400 text-sm">Workspace Sync: <span className="text-indigo-400 font-bold uppercase tracking-widest text-[10px]">Active Neo Mode</span></p>
-                   </div>
-                   <div className="bg-black/20 p-4 rounded-2xl border border-white/5 flex items-center gap-4">
-                      <div className="text-right">
-                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Global Quota</p>
-                         <p className="text-lg font-bold text-white leading-tight">Mock Demo</p>
+    <main className="bg-atmosphere min-h-screen">
+      <div className="relative z-10">
+        <header className="max-w-6xl mx-auto px-6 py-6 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-[var(--color-panel)] border border-white/10 flex items-center justify-center">
+              <LayoutGrid className="h-5 w-5 text-[var(--color-accent)]" />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">LVA Studio</p>
+              <h1 className="text-lg font-semibold">LVA B2B Portal Beta</h1>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="badge px-3 py-1 text-xs font-semibold">Local-first</span>
+            <span className="badge-warm px-3 py-1 text-xs font-semibold">Agents Offline</span>
+          </div>
+        </header>
+
+        {mode === "guest" ? (
+          <div className="max-w-6xl mx-auto px-6 pb-20">
+            <section className="grid lg:grid-cols-[1.15fr_0.85fr] gap-12 pt-8">
+              <div className="space-y-8 animate-rise">
+                <div className="space-y-6">
+                  <p className="badge px-4 py-1 text-xs font-semibold w-fit">B2B Member Workspace</p>
+                  <h2 className="text-display text-4xl md:text-5xl font-semibold leading-tight">
+                    Build client-ready systems with an agent-powered canvas workspace.
+                  </h2>
+                  <p className="text-lg text-[var(--color-muted)] max-w-xl">
+                    The LVA portal is evolving into a full operating system for owners and members. No
+                    GitHub dependency, no backend auth yet, just a polished shell that previews the
+                    experience we are shipping.
+                  </p>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {[
+                    { icon: PanelLeft, title: "Owner Visibility", desc: "Monitor teams, projects, and activity with clarity." },
+                    { icon: Grid3x3, title: "Canvas Builder", desc: "Drag, connect, and preview work inside the workspace." },
+                    { icon: ShieldCheck, title: "Security Ready", desc: "Designed for Google login, email + 2FA." },
+                    { icon: Wand2, title: "Agent Guidance", desc: "Neo-style workflows keep teams on track." },
+                  ].map((item) => (
+                    <div key={item.title} className="surface-card p-5 flex gap-4 items-start animate-fade">
+                      <div className="h-10 w-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                        <item.icon className="h-5 w-5 text-[var(--color-accent)]" />
                       </div>
-                      <Zap className="w-8 h-8 text-indigo-400" />
-                   </div>
+                      <div>
+                        <p className="font-semibold">{item.title}</p>
+                        <p className="text-sm text-[var(--color-muted)]">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="surface-card p-6 flex flex-wrap items-center gap-4">
+                  <div className="flex items-center gap-3">
+                    <Cloud className="h-5 w-5 text-[var(--color-accent)]" />
+                    <p className="text-sm text-[var(--color-muted)]">Future auth stack</p>
+                  </div>
+                  <div className="flex flex-wrap gap-3 text-xs">
+                    {["Google OAuth", "Email + Password", "2-Step Verification", "Member Roles", "Owner Admin"].map((item) => (
+                      <span key={item} className="badge px-3 py-1">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              {showManageRepos ? (
-                <div className="mb-12 animate-in fade-in duration-500">
-                   <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6 px-1">Repository Management</h3>
-                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {repos.map((repo: any) => (
-                         <div key={repo.id} className="p-4 rounded-xl border border-white/10 bg-white/5 flex items-center justify-between">
-                            <span className={`text-xs font-bold truncate pr-4 ${hiddenRepos.includes(repo.full_name) ? 'line-through text-slate-600 italic' : 'text-slate-300'}`}>{repo.name}</span>
-                            <button onClick={() => toggleHideRepo(repo.full_name)} className={`p-1.5 rounded-md transition ${hiddenRepos.includes(repo.full_name) ? 'bg-indigo-500/20 text-indigo-400' : 'bg-white/5 text-slate-500 hover:text-white'}`}>
-                               {hiddenRepos.includes(repo.full_name) ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                            </button>
-                         </div>
-                      ))}
-                   </div>
+              <div className="surface-card p-8 space-y-6 animate-rise">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">Access</p>
+                    <h3 className="text-2xl font-semibold">{authTab === "login" ? "Sign In" : "Create Account"}</h3>
+                  </div>
+                  <div className="flex gap-2">
+                    {(["login", "signup"] as AuthTab[]).map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setAuthTab(tab)}
+                        className={`px-3 py-1 text-xs rounded-full border ${
+                          authTab === tab
+                            ? "border-[var(--color-accent)] text-[var(--color-accent)]"
+                            : "border-white/10 text-[var(--color-muted)]"
+                        }`}
+                      >
+                        {tab === "login" ? "Login" : "Sign up"}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in slide-in-from-bottom-4 duration-500">
-                  {filteredRepos.map((repo: any) => (
-                     <Link href={`/repo/${repo.owner.login}/${repo.name}`} key={repo.id} className="group">
-                       <div className="p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition cursor-pointer h-full flex flex-col group-hover:translate-y--1 group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] relative">
-                          <div className="absolute top-4 right-4 text-indigo-500/0 group-hover:text-indigo-400 transition transform group-hover:translate-x-1 group-hover:translate-y--1">
-                             <ChevronRight className="w-5 h-5" />
-                          </div>
-                          <div className="flex items-center gap-4 mb-6">
-                             <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center ring-1 ring-white/10 group-hover:ring-indigo-500/50 group-hover:bg-indigo-500/10 transition">
-                                <GitBranch className="w-6 h-6 text-slate-400 group-hover:text-indigo-400 transition" />
-                             </div>
-                             <h3 className="font-bold text-lg text-white truncate">{repo.name}</h3>
-                          </div>
-                          <p className="text-slate-400 text-sm flex-1 leading-relaxed opacity-80">{repo.description || "Production workspace for agentic operations."}</p>
-                          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-400 mt-8 flex justify-between items-center opacity-60 group-hover:opacity-100 transition">
-                             <span>{repo.language || "Native Repo"}</span>
-                             <span className="bg-white/5 px-3 py-1 rounded-full">{new Date(repo.updated_at).toLocaleDateString()}</span>
-                          </div>
-                       </div>
-                     </Link>
-                  ))}
-                  {filteredRepos.length === 0 && (
-                     <div className="col-span-full py-20 text-center flex flex-col items-center gap-4 opacity-40">
-                        <LayoutGrid className="w-12 h-12 text-slate-600" />
-                        <p className="text-sm font-bold uppercase tracking-widest text-slate-400 italic">Workspace Filter Active. No public repos showing.</p>
-                     </div>
+
+                <form className="space-y-4">
+                  <div>
+                    <label className="text-xs text-[var(--color-muted)] uppercase tracking-[0.2em]">Email</label>
+                    <input
+                      placeholder="member@lvastudio.com"
+                      className="mt-2 w-full rounded-2xl bg-black/40 border border-white/10 px-4 py-3 text-sm outline-hidden focus:border-[var(--color-accent)]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-[var(--color-muted)] uppercase tracking-[0.2em]">Password</label>
+                    <input
+                      type="password"
+                      placeholder="••••••••"
+                      className="mt-2 w-full rounded-2xl bg-black/40 border border-white/10 px-4 py-3 text-sm outline-hidden focus:border-[var(--color-accent)]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-[var(--color-muted)] uppercase tracking-[0.2em]">2-Step Code</label>
+                    <input
+                      placeholder="123 456"
+                      className="mt-2 w-full rounded-2xl bg-black/40 border border-white/10 px-4 py-3 text-sm outline-hidden focus:border-[var(--color-accent)]"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    className="w-full rounded-2xl bg-[var(--color-accent)] text-slate-900 font-semibold py-3 flex items-center justify-center gap-2"
+                  >
+                    Continue <ArrowRight className="h-4 w-4" />
+                  </button>
+                </form>
+
+                <div className="border-t border-white/10 pt-5 space-y-3">
+                  <p className="text-xs text-[var(--color-muted)]">
+                    Mock login only. Pick a role to preview the workspace.
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setMode("owner")}
+                      className="w-full rounded-2xl border border-white/10 px-4 py-3 text-sm flex items-center justify-between hover:border-[var(--color-accent)] transition"
+                    >
+                      <span className="flex items-center gap-3">
+                        <Crown className="h-4 w-4 text-[var(--color-accent)]" />
+                        Enter as Owner
+                      </span>
+                      <ChevronRight className="h-4 w-4 text-[var(--color-muted)]" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMode("member")}
+                      className="w-full rounded-2xl border border-white/10 px-4 py-3 text-sm flex items-center justify-between hover:border-[var(--color-accent)] transition"
+                    >
+                      <span className="flex items-center gap-3">
+                        <Users className="h-4 w-4 text-[var(--color-accent)]" />
+                        Enter as Member
+                      </span>
+                      <ChevronRight className="h-4 w-4 text-[var(--color-muted)]" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        ) : (
+          <div className="max-w-7xl mx-auto px-6 pb-16">
+            <section className="surface-card px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                  {mode === "owner" ? (
+                    <Crown className="h-5 w-5 text-[var(--color-accent)]" />
+                  ) : (
+                    <Users className="h-5 w-5 text-[var(--color-accent)]" />
                   )}
                 </div>
-              )}
-           </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">
+                    {mode === "owner" ? "Owner Console" : "Member Portal"}
+                  </p>
+                  <h2 className="text-lg font-semibold">Welcome back, LoneWolf</h2>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="badge px-3 py-1 text-xs font-semibold">Workspace Online</span>
+                <button
+                  type="button"
+                  onClick={() => setMode("guest")}
+                  className="text-xs uppercase tracking-[0.2em] text-[var(--color-muted)] hover:text-[var(--color-accent)]"
+                >
+                  Mock Sign Out
+                </button>
+              </div>
+            </section>
+
+            <div className="mt-8 grid xl:grid-cols-[260px_1fr_320px] gap-6">
+              <aside className="surface-panel p-5 space-y-6">
+                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">
+                  <PanelLeft className="h-4 w-4 text-[var(--color-accent)]" />
+                  Project Rail
+                </div>
+                <div className="space-y-3">
+                  {mockProjects.map((project) => (
+                    <div key={project.name} className="canvas-node p-4 space-y-2">
+                      <div className="flex items-center justify-between text-sm font-semibold">
+                        <span>{project.name}</span>
+                        <span className="badge-warm px-2 py-0.5 text-[10px]">{project.tag}</span>
+                      </div>
+                      <p className="text-xs text-[var(--color-muted)]">{project.status}</p>
+                      <div className="flex items-center gap-2 text-[10px] text-[var(--color-muted)]">
+                        <FileStack className="h-3 w-3" />
+                        12 assets connected
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  className="w-full rounded-2xl border border-white/10 px-4 py-3 text-sm flex items-center justify-center gap-2 hover:border-[var(--color-accent)]"
+                >
+                  <Sparkles className="h-4 w-4 text-[var(--color-accent)]" />
+                  New Project
+                </button>
+              </aside>
+
+              <section className="space-y-6">
+                <div className="surface-panel p-5 flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">Canvas Editor</p>
+                    <h3 className="text-xl font-semibold">LVA Studio Portal</h3>
+                  </div>
+                  <div className="flex flex-wrap gap-3 text-xs">
+                    <span className="badge px-3 py-1">Draft Mode</span>
+                    <span className="badge-warm px-3 py-1">Preview Ready</span>
+                    <span className="badge px-3 py-1">Auto-save On</span>
+                  </div>
+                </div>
+
+                <div className="canvas-grid p-6 min-h-[420px] relative overflow-hidden">
+                  <div className="absolute inset-0 pointer-events-none">
+                    <div className="absolute top-10 left-16 h-24 w-24 rounded-full bg-[var(--color-accent)]/10 blur-2xl animate-float" />
+                    <div className="absolute bottom-16 right-20 h-28 w-28 rounded-full bg-[var(--color-accent-2)]/20 blur-3xl animate-float" />
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-5 relative z-10">
+                    {[
+                      { title: "Client Onboarding", desc: "Collect intake data and route to agents." },
+                      { title: "Design Sprint", desc: "Align deliverables and visual language." },
+                      { title: "Ops Workflow", desc: "Trigger checklists and approvals." },
+                      { title: "Final Preview", desc: "Publish polished outputs." },
+                    ].map((node) => (
+                      <div key={node.title} className="canvas-node p-4 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <p className="font-semibold">{node.title}</p>
+                          <CheckCircle2 className="h-4 w-4 text-[var(--color-accent)]" />
+                        </div>
+                        <p className="text-xs text-[var(--color-muted)]">{node.desc}</p>
+                        <div className="flex items-center gap-2 text-[10px] text-[var(--color-muted)]">
+                          <ClipboardList className="h-3 w-3" />
+                          4 linked tasks
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="surface-panel p-5 flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 text-sm text-[var(--color-muted)]">
+                    <PenTool className="h-4 w-4 text-[var(--color-accent)]" />
+                    Drag nodes, connect outputs, and preview deliverables.
+                  </div>
+                  <button
+                    type="button"
+                    className="rounded-2xl bg-[var(--color-accent)] text-slate-900 font-semibold px-4 py-2 text-sm flex items-center gap-2"
+                  >
+                    Launch Preview <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </section>
+
+              <aside className="surface-panel p-5 space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                    <Bot className="h-5 w-5 text-[var(--color-accent)]" />
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">Agent Control</p>
+                    <h4 className="text-lg font-semibold">Neo Workflow Stack</h4>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {agentQueue.map((agent) => (
+                    <div key={agent.title} className="canvas-node p-4 space-y-2">
+                      <div className="flex items-center justify-between text-sm font-semibold">
+                        <span>{agent.title}</span>
+                        <span className="badge px-2 py-0.5 text-[10px]">{agent.role}</span>
+                      </div>
+                      <p className="text-xs text-[var(--color-muted)]">{agent.task}</p>
+                      <div className="flex items-center gap-2 text-[10px] text-[var(--color-muted)]">
+                        <Sparkles className="h-3 w-3" />
+                        Awaiting signal
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="surface-card p-4 space-y-3">
+                  <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">
+                    <Lock className="h-4 w-4 text-[var(--color-accent)]" />
+                    Access Controls
+                  </div>
+                  <div className="flex flex-col gap-2 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span>{mode === "owner" ? "Owner overrides" : "Member role"}</span>
+                      <span className="badge px-2 py-0.5 text-[10px]">Active</span>
+                    </div>
+                    <div className="flex items-center justify-between text-[var(--color-muted)] text-xs">
+                      <span>2-Step required</span>
+                      <span className="badge-warm px-2 py-0.5 text-[10px]">Configured</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="w-full rounded-2xl border border-white/10 px-4 py-3 text-sm flex items-center justify-between hover:border-[var(--color-accent)]"
+                >
+                  Open Agent Brief <ArrowRight className="h-4 w-4" />
+                </button>
+              </aside>
+            </div>
+          </div>
         )}
       </div>
-
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[700px] bg-indigo-500/5 rounded-full blur-[120px] pointer-events-none z-0" />
     </main>
   );
 }
