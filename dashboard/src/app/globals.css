@@ -43,6 +43,7 @@ body {
   border-radius: 24px;
   backdrop-filter: blur(14px);
   box-shadow: 0 16px 36px rgba(5, 7, 12, 0.45);
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
 
 .surface-panel {
@@ -51,6 +52,7 @@ body {
   border-radius: 20px;
   backdrop-filter: blur(18px);
   box-shadow: 0 18px 40px rgba(5, 7, 12, 0.55);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
 .accent-glow {
@@ -73,6 +75,13 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   box-shadow: 0 14px 30px rgba(5, 7, 12, 0.35);
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.canvas-node:hover {
+  border-color: rgba(34, 211, 238, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 18px 34px rgba(5, 7, 12, 0.45);
 }
 
 .btn-primary {
@@ -82,7 +91,7 @@ body {
   padding: 10px 16px;
   font-weight: 600;
   border: 1px solid transparent;
-  transition: all 0.2s ease;
+  transition: all 160ms ease;
 }
 
 .btn-primary:hover {
@@ -97,7 +106,7 @@ body {
   border-radius: 16px;
   padding: 10px 16px;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: all 160ms ease;
 }
 
 .btn-secondary:hover {
@@ -111,7 +120,7 @@ body {
   border-radius: 16px;
   padding: 10px 16px;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: all 160ms ease;
 }
 
 .btn-ghost:hover {
@@ -127,7 +136,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 160ms ease;
 }
 
 .icon-btn:hover {
@@ -142,7 +151,7 @@ body {
   background: rgba(7, 10, 18, 0.5);
   color: var(--color-text);
   font-weight: 600;
-  transition: all 0.2s ease;
+  transition: all 160ms ease;
 }
 
 .tool-btn:hover {
@@ -155,12 +164,59 @@ body {
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: var(--color-muted);
-  transition: all 0.2s ease;
+  transition: all 160ms ease;
 }
 
 .chip:hover {
   border-color: rgba(34, 211, 238, 0.5);
   color: var(--color-text);
+}
+
+.chip-strong {
+  background: rgba(34, 211, 238, 0.12);
+  border-color: rgba(34, 211, 238, 0.35);
+  color: #e0f2fe;
+  font-weight: 600;
+}
+
+.chip-strong:hover {
+  border-color: rgba(34, 211, 238, 0.6);
+}
+
+.input-field {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(4, 7, 12, 0.6);
+  padding: 10px 14px;
+  color: var(--color-text);
+  font-size: 14px;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.input-field:focus {
+  border-color: rgba(34, 211, 238, 0.6);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.12);
+  outline: none;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.topbar-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.topbar-subtitle {
+  font-size: 12px;
+  color: var(--color-muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
 }
 
 .typing-dot {

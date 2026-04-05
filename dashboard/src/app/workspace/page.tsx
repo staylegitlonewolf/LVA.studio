@@ -238,45 +238,63 @@ export default function WorkspacePage() {
               ))}
             </div>
 
-            <div className="surface-card p-4 space-y-4">
-              <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">
-                <SlidersHorizontal className="h-4 w-4 text-[var(--color-accent)]" />
-                Agent Chat
+            <div className="surface-card p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">
+                  <SlidersHorizontal className="h-4 w-4 text-[var(--color-accent)]" />
+                  Agent Chat
+                </div>
+                <span className="badge px-2 py-0.5 text-[10px]">Live</span>
               </div>
-              <div className="text-sm text-[var(--color-muted)]">
-                Hi Jessica, what should we build today?
+
+              <div className="space-y-3">
+                <div className="rounded-2xl border border-white/10 bg-black/40 p-3">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-muted)]">Sciplex</p>
+                  <p className="text-sm text-[var(--color-text)] mt-1">
+                    Hi Jessica, I can build a first draft or map your workflow. What should we do?
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-muted)]">You</p>
+                  <p className="text-sm text-[var(--color-text)] mt-1">
+                    Let’s start with a landing page + onboarding flow.
+                  </p>
+                </div>
               </div>
+
               <div className="flex flex-wrap gap-2">
                 {quickPrompts.map((prompt) => (
                   <button
                     key={prompt}
                     onClick={() => handlePrompt(prompt)}
-                    className="chip"
+                    className="chip chip-strong"
                   >
                     {prompt}
                   </button>
                 ))}
               </div>
+
               <div className="relative">
                 <input
                   value={agentInput}
                   onChange={(event) => setAgentInput(event.target.value)}
                   placeholder="Ask Sciplex..."
-                  className="w-full rounded-2xl bg-black/40 border border-white/10 px-4 py-2 text-sm outline-hidden focus:border-[var(--color-accent)]"
+                  className="input-field pr-16"
                 />
                 {isTyping ? (
-                  <div className="absolute right-4 top-2.5 flex items-center gap-1 text-[var(--color-muted)] text-xs">
+                  <div className="absolute right-4 top-3 flex items-center gap-1 text-[var(--color-muted)] text-xs">
                     <span className="typing-dot" />
                     <span className="typing-dot delay-150" />
                     <span className="typing-dot delay-300" />
                   </div>
                 ) : null}
               </div>
-              <div className="flex gap-2">
+
+              <div className="flex items-center gap-2">
                 <button className="btn-primary flex-1" onClick={() => handlePrompt("Generate first draft")}>
-                  Send Prompt
+                  Send to Sciplex
                 </button>
-                <button className="btn-secondary" onClick={() => handlePrompt("Summarize project context")}>
+                <button className="btn-ghost" onClick={() => handlePrompt("Summarize project context")}>
                   <Wand2 className="h-4 w-4" />
                 </button>
               </div>
