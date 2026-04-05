@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 import {
   ArrowRight,
   Bell,
@@ -41,6 +42,11 @@ export default function ProjectsHome() {
   const searchParams = useSearchParams();
   const role = searchParams.get("role") ?? "member";
   const isOwner = role === "owner";
+  const [activeProject, setActiveProject] = useState(recentProjects[0]);
+  const [continueEditing, setContinueEditing] = useState({
+    label: recentProjects[0].name,
+    source: "Project",
+  });
 
   return (
     <main className="bg-atmosphere min-h-screen">
@@ -74,19 +80,30 @@ export default function ProjectsHome() {
       <div className="max-w-7xl mx-auto px-6 pb-16 grid xl:grid-cols-[260px_1fr_320px] gap-6">
         <aside className="surface-panel p-5 space-y-6">
           <div className="text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">Navigation</div>
-          <button className="w-full rounded-2xl bg-[var(--color-accent)] text-slate-900 font-semibold py-3 flex items-center justify-center gap-2">
+          <button className="btn-primary w-full flex items-center justify-center gap-2">
             <Plus className="h-4 w-4" />
             New Project
           </button>
           <div className="space-y-3">
             {recentProjects.map((project) => (
-              <div key={project.name} className="canvas-node p-4 space-y-2">
+              <button
+                key={project.name}
+                onClick={() => {
+                  setActiveProject(project);
+                  setContinueEditing({ label: project.name, source: "Project" });
+                }}
+                className={`w-full text-left canvas-node p-4 space-y-2 transition ${
+                  activeProject.name === project.name
+                    ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10"
+                    : ""
+                }`}
+              >
                 <div className="flex items-center justify-between text-sm font-semibold">
                   <span>{project.name}</span>
                   <span className="badge-warm px-2 py-0.5 text-[10px]">{project.status}</span>
                 </div>
                 <p className="text-xs text-[var(--color-muted)]">Updated {project.updated}</p>
-              </div>
+              </button>
             ))}
           </div>
           <div className="space-y-2 text-xs text-[var(--color-muted)]">
@@ -128,9 +145,9 @@ export default function ProjectsHome() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">Continue Editing</p>
-                <h3 className="text-lg font-semibold">LVA Studio Portal</h3>
+                <h3 className="text-lg font-semibold">{continueEditing.label}</h3>
               </div>
-              <span className="badge px-3 py-1 text-xs">Draft Mode</span>
+              <span className="badge px-3 py-1 text-xs">{continueEditing.source}</span>
             </div>
             <p className="text-sm text-[var(--color-muted)]">
               Last opened 2 hours ago. 12 nodes connected.
@@ -138,14 +155,14 @@ export default function ProjectsHome() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href={`/workspace?role=${role}`}
-                className="rounded-2xl bg-white/10 border border-white/10 px-4 py-2 text-sm flex items-center gap-2 hover:border-[var(--color-accent)]"
+                className="btn-secondary"
               >
                 Open Canvas <ArrowRight className="h-4 w-4" />
               </Link>
               {isOwner ? (
                 <Link
                   href="/owner"
-                  className="rounded-2xl border border-white/10 px-4 py-2 text-sm flex items-center gap-2 hover:border-[var(--color-accent)]"
+                  className="btn-ghost"
                 >
                   Owner Dashboard <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -162,7 +179,13 @@ export default function ProjectsHome() {
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               {templates.map((template) => (
-                <div key={template.name} className="canvas-node p-4 space-y-2">
+                <button
+                  key={template.name}
+                  onClick={() =>
+                    setContinueEditing({ label: template.name, source: "Template" })
+                  }
+                  className="text-left canvas-node p-4 space-y-2 transition hover:border-[var(--color-accent)]"
+                >
                   <div className="flex items-center justify-between text-sm font-semibold">
                     <span>{template.name}</span>
                     <Star className="h-4 w-4 text-[var(--color-accent)]" />
@@ -171,7 +194,7 @@ export default function ProjectsHome() {
                   <button className="text-xs font-semibold text-[var(--color-accent)] flex items-center gap-2">
                     Use Template <ArrowRight className="h-3 w-3" />
                   </button>
-                </div>
+                </button>
               ))}
             </div>
           </div>

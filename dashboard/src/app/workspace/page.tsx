@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Bot,
@@ -11,25 +14,62 @@ import {
   SlidersHorizontal,
   Sparkles,
   Users,
+  Wand2,
 } from "lucide-react";
 
-const projectList = [
-  "Client Website Redesign",
-  "Marketing Automation",
-  "ChatGPT Integration",
-  "Social Media Planner",
-  "Automated Reports",
+const projects = [
+  { id: "p1", name: "Client Website Redesign", status: "Active", updated: "2 hours ago" },
+  { id: "p2", name: "Marketing Automation", status: "Draft", updated: "Yesterday" },
+  { id: "p3", name: "ChatGPT Integration", status: "Planning", updated: "2 days ago" },
+  { id: "p4", name: "Social Media Planner", status: "Queued", updated: "3 days ago" },
+  { id: "p5", name: "Automated Reports", status: "Review", updated: "Last week" },
+];
+
+const quickPrompts = [
+  "Build a landing page flow",
+  "Map a client portal onboarding",
+  "Generate a campaign workflow",
+  "Draft the project milestones",
+];
+
+const quickActions = [
+  "Create Landing Page",
+  "Start Client Portal",
+  "Ask Sciplex to Build",
 ];
 
 export default function WorkspacePage() {
+  const [activeProjectId, setActiveProjectId] = useState(projects[0].id);
+  const [agentInput, setAgentInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [lastAction, setLastAction] = useState("Ready");
+
+  const activeProject = useMemo(
+    () => projects.find((project) => project.id === activeProjectId) ?? projects[0],
+    [activeProjectId]
+  );
+
+  useEffect(() => {
+    setIsTyping(true);
+    const timeout = setTimeout(() => setIsTyping(false), 1600);
+    return () => clearTimeout(timeout);
+  }, [activeProjectId]);
+
+  const handlePrompt = (prompt: string) => {
+    setAgentInput(prompt);
+    setLastAction("Queued");
+    setIsTyping(true);
+    setTimeout(() => setIsTyping(false), 1600);
+  };
+
   return (
     <main className="min-h-screen bg-atmosphere">
       <div className="max-w-7xl mx-auto px-6 py-6">
-        <header className="surface-panel px-5 py-4 flex flex-wrap items-center justify-between gap-4">
+        <header className="surface-panel px-6 py-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link
               href="/projects"
-              className="h-9 w-9 rounded-full border border-white/10 flex items-center justify-center hover:border-[var(--color-accent)]"
+              className="h-10 w-10 rounded-full border border-white/10 flex items-center justify-center hover:border-[var(--color-accent)]"
             >
               <ChevronLeft className="h-4 w-4" />
             </Link>
@@ -43,13 +83,13 @@ export default function WorkspacePage() {
           </div>
           <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]">
             <span className="badge px-3 py-1 text-[10px]">Team View</span>
-            <button className="h-9 w-9 rounded-full border border-white/10 flex items-center justify-center hover:border-[var(--color-accent)]">
+            <button className="icon-btn">
               <Users className="h-4 w-4" />
             </button>
-            <button className="h-9 w-9 rounded-full border border-white/10 flex items-center justify-center hover:border-[var(--color-accent)]">
+            <button className="icon-btn">
               <MessageSquare className="h-4 w-4" />
             </button>
-            <button className="h-9 w-9 rounded-full border border-white/10 flex items-center justify-center hover:border-[var(--color-accent)]">
+            <button className="icon-btn">
               <Settings className="h-4 w-4" />
             </button>
           </div>
@@ -59,34 +99,44 @@ export default function WorkspacePage() {
           <aside className="surface-panel p-5 space-y-6">
             <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">
               <span>Projects</span>
-              <button className="h-7 w-7 rounded-lg border border-white/10 flex items-center justify-center hover:border-[var(--color-accent)]">
+              <button className="icon-btn h-7 w-7">
                 <Plus className="h-3 w-3" />
               </button>
             </div>
-            <button className="w-full rounded-2xl bg-[var(--color-accent)] text-slate-900 font-semibold py-3 flex items-center justify-center gap-2">
+            <button className="btn-primary w-full flex items-center justify-center gap-2">
               <FolderPlus className="h-4 w-4" />
               New Project
             </button>
             <div className="space-y-2">
-              {projectList.map((project) => (
-                <div
-                  key={project}
-                  className="flex items-center gap-3 p-3 rounded-2xl border border-white/5 bg-white/5 hover:border-[var(--color-accent)]"
+              {projects.map((project) => (
+                <button
+                  key={project.id}
+                  onClick={() => setActiveProjectId(project.id)}
+                  className={`w-full text-left flex items-center gap-3 p-3 rounded-2xl border transition ${
+                    activeProjectId === project.id
+                      ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10"
+                      : "border-white/5 bg-white/5 hover:border-[var(--color-accent)]"
+                  }`}
                 >
                   <div className="h-8 w-8 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center">
                     <Sparkles className="h-4 w-4 text-[var(--color-accent)]" />
                   </div>
-                  <span className="text-sm">{project}</span>
-                </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold">{project.name}</p>
+                    <p className="text-[10px] text-[var(--color-muted)]">
+                      {project.status} · {project.updated}
+                    </p>
+                  </div>
+                </button>
               ))}
             </div>
-            <div className="surface-card p-4 space-y-2">
+            <div className="surface-card p-4 space-y-3">
               <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">Quick Actions</p>
-              <button className="w-full rounded-2xl border border-white/10 px-3 py-2 text-sm flex items-center justify-between hover:border-[var(--color-accent)]">
+              <button className="btn-secondary w-full flex items-center justify-between">
                 Invite Members
                 <Users className="h-4 w-4" />
               </button>
-              <button className="w-full rounded-2xl border border-white/10 px-3 py-2 text-sm flex items-center justify-between hover:border-[var(--color-accent)]">
+              <button className="btn-secondary w-full flex items-center justify-between">
                 Search Assets
                 <Search className="h-4 w-4" />
               </button>
@@ -97,18 +147,15 @@ export default function WorkspacePage() {
             <div className="surface-panel p-4 flex flex-wrap items-center justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">Canvas</p>
-                <h2 className="text-xl font-semibold">Start Building</h2>
+                <h2 className="text-xl font-semibold">{activeProject.name}</h2>
+                <p className="text-sm text-[var(--color-muted)]">
+                  {activeProject.status} · Updated {activeProject.updated}
+                </p>
               </div>
-              <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]">
-                <button className="rounded-full border border-white/10 px-3 py-1 hover:border-[var(--color-accent)]">
-                  Undo
-                </button>
-                <button className="rounded-full border border-white/10 px-3 py-1 hover:border-[var(--color-accent)]">
-                  Redo
-                </button>
-                <button className="rounded-full border border-white/10 px-3 py-1 hover:border-[var(--color-accent)]">
-                  Preview
-                </button>
+              <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]">
+                <button className="btn-ghost">Undo</button>
+                <button className="btn-ghost">Redo</button>
+                <button className="btn-secondary">Preview</button>
               </div>
             </div>
 
@@ -120,28 +167,46 @@ export default function WorkspacePage() {
 
               <div className="absolute left-6 top-6 flex flex-col gap-3">
                 {["C", "+", "S", "M"].map((tool) => (
-                  <button
-                    key={tool}
-                    className="h-10 w-10 rounded-2xl border border-white/10 bg-black/40 text-sm font-semibold hover:border-[var(--color-accent)]"
-                  >
+                  <button key={tool} className="tool-btn">
                     {tool}
                   </button>
                 ))}
               </div>
 
-              <div className="flex flex-col items-center justify-center h-full text-center relative z-10">
-                <p className="text-2xl font-semibold">Start Building</p>
-                <p className="text-sm text-[var(--color-muted)] mt-2 max-w-md">
-                  Create a project, then drag components onto the canvas to connect workflows. Ask
-                  Sciplex or Neo to generate your first sequence.
-                </p>
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <button className="rounded-2xl bg-[var(--color-accent)] text-slate-900 font-semibold px-4 py-2">
-                    New Project
-                  </button>
-                  <button className="rounded-2xl border border-white/10 px-4 py-2 text-sm hover:border-[var(--color-accent)]">
-                    Pick & Connect Components
-                  </button>
+              <div className="absolute right-12 top-16 space-y-4">
+                {["Client Intake", "Generate AI Content", "Email Campaign"].map((node) => (
+                  <div key={node} className="canvas-node px-4 py-3 text-sm w-40">
+                    {node}
+                  </div>
+                ))}
+              </div>
+
+              <div className="absolute left-24 bottom-16 space-y-3">
+                {["Lead Form", "Gmail Automation"].map((node) => (
+                  <div key={node} className="canvas-node px-4 py-3 text-sm w-36">
+                    {node}
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-col items-center justify-center h-full text-center relative z-10 space-y-6">
+                <div>
+                  <p className="text-2xl font-semibold">Start Building</p>
+                  <p className="text-sm text-[var(--color-muted)] mt-2 max-w-md">
+                    Create a project, drag components onto the canvas, and connect workflows. Ask
+                    Sciplex or Neo to generate your first sequence.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-3 justify-center">
+                  {quickActions.map((action) => (
+                    <button
+                      key={action}
+                      className="btn-secondary"
+                      onClick={() => handlePrompt(action)}
+                    >
+                      {action}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
@@ -166,14 +231,14 @@ export default function WorkspacePage() {
                 <div key={agent.name} className="canvas-node p-4 space-y-2">
                   <div className="flex items-center justify-between text-sm font-semibold">
                     <span>{agent.name}</span>
-                    <span className="badge px-2 py-0.5 text-[10px]">Ready</span>
+                    <span className="badge px-2 py-0.5 text-[10px]">{lastAction}</span>
                   </div>
                   <p className="text-xs text-[var(--color-muted)]">{agent.desc}</p>
                 </div>
               ))}
             </div>
 
-            <div className="surface-card p-4 space-y-3">
+            <div className="surface-card p-4 space-y-4">
               <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-[var(--color-muted)]">
                 <SlidersHorizontal className="h-4 w-4 text-[var(--color-accent)]" />
                 Agent Chat
@@ -181,10 +246,40 @@ export default function WorkspacePage() {
               <div className="text-sm text-[var(--color-muted)]">
                 Hi Jessica, what should we build today?
               </div>
-              <input
-                placeholder="Ask Sciplex..."
-                className="w-full rounded-2xl bg-black/40 border border-white/10 px-4 py-2 text-sm outline-hidden focus:border-[var(--color-accent)]"
-              />
+              <div className="flex flex-wrap gap-2">
+                {quickPrompts.map((prompt) => (
+                  <button
+                    key={prompt}
+                    onClick={() => handlePrompt(prompt)}
+                    className="chip"
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+              <div className="relative">
+                <input
+                  value={agentInput}
+                  onChange={(event) => setAgentInput(event.target.value)}
+                  placeholder="Ask Sciplex..."
+                  className="w-full rounded-2xl bg-black/40 border border-white/10 px-4 py-2 text-sm outline-hidden focus:border-[var(--color-accent)]"
+                />
+                {isTyping ? (
+                  <div className="absolute right-4 top-2.5 flex items-center gap-1 text-[var(--color-muted)] text-xs">
+                    <span className="typing-dot" />
+                    <span className="typing-dot delay-150" />
+                    <span className="typing-dot delay-300" />
+                  </div>
+                ) : null}
+              </div>
+              <div className="flex gap-2">
+                <button className="btn-primary flex-1" onClick={() => handlePrompt("Generate first draft")}>
+                  Send Prompt
+                </button>
+                <button className="btn-secondary" onClick={() => handlePrompt("Summarize project context")}>
+                  <Wand2 className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           </aside>
         </div>
